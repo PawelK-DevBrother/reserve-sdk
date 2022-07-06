@@ -1,6 +1,6 @@
 {
   "name": "reserve-sdk",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Simple sdk for reserve",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -22,7 +22,7 @@
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0"
   },
-   "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/PawelK-DevBrother/reserve-sdk"
   }
