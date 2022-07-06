@@ -1,28 +1,32 @@
 // Tools
-import {gql_client} from './graphQLClient';
 import {GraphQlCustomError} from './utils';
-import {gql, Variables} from 'graphql-request';
+import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
-import {HealthcheckResult} from './types/utils.types';
-import {DemoSigninArgs, SignInResult} from './types/demo.signin.types';
-import {AccountBalance, GetAccountBalanceArgs} from './types/accounts.types';
-import {User, SortDirection, GetUsersFilterArgs} from './types/users.types';
-import {RecordTransactionItem, CreateAccountTransactionResult} from './types/transactions.types';
+import {HealthcheckResult} from './@types/utils.types';
+import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
+import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
+import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
+import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
 import {
     CreateConversionQuoteResult,
     CreateConverstionQuoteArgs as CreateConversionQuoteArgs,
     CreateConversionOrderArgs,
     Conversion,
-} from './types/conversion.types';
+} from './@types/conversion.types';
 
-class Sdk {
+export class Reserve_SDK {
+    private gql_client: GraphQLClient;
     private auth_token: string;
+
+    constructor(endpoint: string) {
+        this.gql_client = new GraphQLClient(endpoint);
+    }
 
     setAuthToken(token: string): void {
         this.auth_token = token;
     }
     private async gql_request(body: string, variables: Variables = undefined) {
-        const res = gql_client.request(body, variables, {authorization: `Bearer ${this.auth_token}`}).catch((e) => {
+        return this.gql_client.request(body, variables, {authorization: `Bearer ${this.auth_token}`}).catch((e) => {
             throw new GraphQlCustomError(
                 e.response.errors[0].message,
                 e.response.status,
@@ -30,7 +34,6 @@ class Sdk {
                 e.request.variables,
             );
         });
-        return res;
     }
 
     async healthCheck(): Promise<HealthcheckResult> {
