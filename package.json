@@ -21,5 +21,9 @@
     "dotenv": "^16.0.1",
     "graphql": "^16.5.0",
     "graphql-request": "^4.3.0"
+  },
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PawelK-DevBrother/reserve-sdk"
   }
 }
