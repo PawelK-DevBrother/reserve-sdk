@@ -2,7 +2,7 @@
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
-import {HealthcheckResult} from './@types/utils.types';
+import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
@@ -36,7 +36,17 @@ export class Reserve_SDK {
         });
     }
 
-    async healthCheck(): Promise<HealthcheckResult> {
+    /**
+     * **ASYNC** `healthcheck` method allows to perform healtcheck request
+     * * ### Usage
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.healthcheck();
+     * ```
+     */
+    async healthcheck(): Promise<HealthCheckResult> {
         const query = gql`
             query {
                 healthcheck {
@@ -49,12 +59,14 @@ export class Reserve_SDK {
         return healthcheck;
     }
     /**
-     * **ASYNC** `checkin` method allows **AUTHENTICATED** users to perform a GraphQL request in order to checkin
+     * **ASYNC** `checkin` method allows **AUTHENTICATED** users to perform check-in request
      * * ### Usage
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_or_trader_token");
-     * const result = await Sdk_Instance.checkin();
+     * const res = await Sdk_Instance.checkin();
      * ```
      */
     async checkin(): Promise<boolean> {
@@ -71,8 +83,10 @@ export class Reserve_SDK {
      * **ASYNC** `trader_demo_signin` method allows to obtain demo **TRADER** authentication token for specified username
      * * ### Usage
      * ```ts
-     * const Sdk_Instance = new Sdk();
-     * const signin_result = await Sdk_Instance.trader_demo_signin({username:"example_1_2_3"});
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.trader_demo_signin({username:"example_1_2_3"});
      * ```
      */
     async trader_demo_signin(args: DemoSigninArgs): Promise<SignInResult> {
@@ -93,8 +107,10 @@ export class Reserve_SDK {
      * **ASYNC** `admin_demo_signin` method allows to obtain demo **ADMIN** authentication token for specified username
      * * ### Usage
      * ```ts
-     * const Sdk_Instance = new Sdk();
-     * const signin_result = await Sdk_Instance.admin_demo_signin({username:"example_1_2_3"});
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.admin_demo_signin({username:"example_1_2_3"});
      * ```
      */
     async admin_demo_signin(args: DemoSigninArgs): Promise<SignInResult> {
@@ -112,10 +128,12 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `get_users` method allows ADMINS to perform a GraphQL request in order to get users that can be filtered by multiple parameters
+     * **ASYNC** `get_users` method allows ADMINS to get users that can be filtered by multiple parameters
      * * ### Usage
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_token");
      * const users = await Sdk_Instance.get_users({username: 'y', pager: {limit: 3}});
      * ```
@@ -176,19 +194,23 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `get_account_balances` method allows **AUTHENTICATED** users to perform a GraphQL request in order to get account/'s balance
+     * **ASYNC** `get_account_balances` method allows **AUTHENTICATED** users to get account balance
      * * ### Usage
      *
-     * *Trader* - no **args** are required
+     * **Trader** - no **args** are required
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("trader_token");
      * const accounts_balances_trader = await Sdk_Instance.get_account_balances();
      * ```
      *
-     * *Admin* - user_id **arg** is required
+     * **Admin** - user_id **arg** is required
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_token")
      * const accounts_balances_admin = await Sdk_Instance.get_account_balances({user_id: '3e8a836f-9bf5-4915-8c0b-e628396740bf'});
      * ```
@@ -213,11 +235,13 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `create_conversion_quote` method allows **AUTHENTICATED** users to perform a GraphQL request in order to get estimated conversion_quote
+     * **ASYNC** `create_conversion_quote` method allows **AUTHENTICATED** users to get estimated conversion_quote
      * * ### Usage
      *
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_or_trader_token");
      * const conversion_quote = await Sdk_Instance.create_conversion_quote({source_currency_id: 'BTC', target_currency_id: 'USDT', source_currency_amount: 30});
      * ```
@@ -258,13 +282,15 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `create_conversion_order` method allows **AUTHENTICATED** users to perform a GraphQL request in order to execute estimated conversion_quote
+     * **ASYNC** `create_conversion_order` method allows **AUTHENTICATED** users to execute estimated conversion_quote
      * * ### Usage
      *
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_or_trader_token");
-     * const result = await Sdk_Instance.create_conversion_order({conversion_quote_id: 'your_conversion_quote_id'});
+     * const res = await Sdk_Instance.create_conversion_order({conversion_quote_id: 'your_conversion_quote_id'});
      * ```
      */
     async create_conversion_order(args: CreateConversionOrderArgs): Promise<Conversion> {
@@ -311,12 +337,14 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `create_account_transaction` method allows **ADMINS** to perform a GraphQL request in order to create new transactions
+     * **ASYNC** `create_account_transaction` method allows **ADMINS** to create new transactions
      * * ### Usage
      * ```ts
-     * const Sdk_Instance = new Sdk();
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken('your_admin_token');
-     * const result = await Sdk_Instance.create_account_transaction({
+     * const res = await Sdk_Instance.create_account_transaction({
      *          items: [
      *               {
      *                  user_id: '3e8a836f-9bf5-4915-8c0b-e628396740bf',
