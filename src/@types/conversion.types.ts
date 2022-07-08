@@ -3,9 +3,9 @@ interface EstimateOrderFee {
     amount: number;
 }
 enum ConversionStatus {
-    new,
-    completed,
-    rejected,
+    new = 'new',
+    completed = 'completed',
+    rejected = 'rejected',
 }
 
 export interface CreateConverstionQuoteArgs {

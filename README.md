@@ -175,3 +175,33 @@ const res = await Sdk_Instance.create_account_transaction({
          },
     ],
 });
+```
+
+#### Get instruments
+
+##### Allows to get detailed data about instruments
+
+```ts
+import {Reserve_SDK, InstrumentHistoryPeriodicity} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+const res = await Sdk_Instance.get_instruments({
+   periodicity: InstrumentHistoryPeriodicity['day'],
+   limit: 3,
+});
+```
+
+#### Get instruments price bars
+
+##### Allows to get detailed price bars data about specified instrument
+
+```ts
+import {Reserve_SDK, InstrumentHistoryPeriodicity} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK(config.graphQL.endpoint);
+const res = await Sdk_Instance.get_instrument_price_bars({
+    instrument_id: 'BTCUSDT',
+    periodicity: InstrumentHistoryPeriodicity.day,
+    limit: 3,
+});
+```

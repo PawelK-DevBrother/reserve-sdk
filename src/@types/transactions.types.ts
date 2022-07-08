@@ -1,14 +1,14 @@
 export enum AccountTransactionType {
-    debit,
-    credit,
+    debit = 'debit',
+    credit = 'credit',
 }
 
 export enum AccountTransactionClass {
-    trade,
-    fee,
-    payment,
-    reward,
-    conversion,
+    trade = 'trade',
+    fee = 'fee',
+    payment = 'payment',
+    reward = 'reward',
+    conversion = 'conversion',
 }
 
 interface AccountTransaction {

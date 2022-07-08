@@ -1,21 +1,21 @@
 import {DateRangeInput} from './users.types';
 
 export enum CurrencyType {
-    crypto,
-    fiat,
+    crypto = 'crypto',
+    fiat = 'fiat',
 }
 
 export enum InstrumentHistoryPeriodicity {
-    minute,
-    minute5,
-    minute15,
-    minute30,
-    hour,
-    hour4,
-    hour8,
-    day,
-    week,
-    month,
+    minute = 'minute',
+    minute5 = 'minute5',
+    minute15 = 'minute15',
+    minute30 = 'minute30',
+    hour = 'hour',
+    hour4 = 'hour4',
+    hour8 = 'hour8',
+    day = 'day',
+    week = 'week',
+    month = 'month',
 }
 
 export interface Instrument {
@@ -76,4 +76,8 @@ export interface GetInstrumentsArgs {
     limit?: number;
     data_range?: DateRangeInput;
     periodicity?: InstrumentHistoryPeriodicity;
+}
+
+export interface GetInstrumentPriceBarsArgs extends GetInstrumentsArgs {
+    instrument_id: string;
 }

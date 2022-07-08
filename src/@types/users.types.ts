@@ -29,8 +29,8 @@ export interface User {
 }
 
 export enum SortDirection {
-    ASC,
-    DESC,
+    ASC = 'ASC',
+    DESC = 'DESC',
 }
 
 export interface DateRangeInput {

@@ -2,19 +2,18 @@
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
-import {GetInstrumentsArgs, Instrument} from './@types/instrument.types';
 import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
-import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
+import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
+import {GetInstrumentsArgs, Instrument, GetInstrumentPriceBarsArgs} from './@types/instrument.types';
 import {
     CreateConversionQuoteResult,
     CreateConverstionQuoteArgs as CreateConversionQuoteArgs,
     CreateConversionOrderArgs,
     Conversion,
 } from './@types/conversion.types';
-import {config} from './config';
 
 export class Reserve_SDK {
     private gql_client: GraphQLClient;
@@ -151,7 +150,7 @@ export class Reserve_SDK {
             user_id: '',
             pager: {limit: 30, offset: 0},
             sort: {
-                direction: SortDirection[SortDirection.DESC],
+                direction: SortDirection.DESC,
             },
             dateRange: {},
         };
@@ -406,6 +405,20 @@ export class Reserve_SDK {
         return create_account_transaction;
     }
 
+    /**
+     * **ASYNC** `get_instruments` method allows to get detailed data about instruments
+     * * ### Usage
+     *
+     * ```ts
+     * import {Reserve_SDK, InstrumentHistoryPeriodicity} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.get_instruments({
+     *   periodicity: InstrumentHistoryPeriodicity['day'],
+     *   limit: 3,
+     * });
+     * ```
+     */
     async get_instruments(args?: GetInstrumentsArgs): Promise<Instrument[]> {
         const defaultArgs = {periodicity: 'day', limit: 1};
 
@@ -476,6 +489,53 @@ export class Reserve_SDK {
 
         return instruments;
     }
+
+    /**
+     * **ASYNC** `get_instrument_price_bars` method allows to get detailed price bars data about specified instrument
+     * * ### Usage
+     *
+     *```ts
+     * import {Reserve_SDK, InstrumentHistoryPeriodicity} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.get_instrument_price_bars({
+     *    instrument_id: 'BTCUSDT',
+     *    periodicity: InstrumentHistoryPeriodicity.day,
+     *    limit: 3,
+     * });
+     * ```
+     */
+    async get_instrument_price_bars(args: GetInstrumentPriceBarsArgs) {
+        const defaultArgs = {periodicity: 'day', limit: 1000};
+
+        const query = gql`
+            query (
+                $instrument_id: String!
+                $periodicity: InstrumentHistoryPeriodicity!
+                $limit: Int
+                $date_range: DateRangeInput
+            ) {
+                instrument_price_bars(
+                    instrument_id: $instrument_id
+                    periodicity: $periodicity
+                    limit: $limit
+                    date_range: $date_range
+                ) {
+                    instrument_id
+                    high
+                    low
+                    open
+                    close
+                    volume_from
+                    volume_to
+                    ts
+                    ts_iso
+                }
+            }
+        `;
+        const {instrument_price_bars} = await this.gql_request(query, {...defaultArgs, ...args});
+        return instrument_price_bars;
+    }
 }
 
 export * from './config';
@@ -487,11 +547,3 @@ export * from './@types/instrument.types';
 export * from './@types/conversion.types';
 export * from './@types/demo.signin.types';
 export * from './@types/transactions.types';
-
-// const main = async () => {
-//     const sdk = new Reserve_SDK(config.graphQL.endpoint);
-
-//     console.log(await sdk.get_instruments());
-// };
-
-// main();
