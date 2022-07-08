@@ -1,4 +1,6 @@
-import 'dotenv/config';
+import {join} from 'path';
+
+require('dotenv').config({path: join(__dirname, '..', '.env')});
 
 export const config = {
     graphQL: {

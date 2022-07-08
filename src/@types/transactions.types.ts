@@ -36,8 +36,8 @@ export interface RecordTransactionItem {
     account_transaction_id?: string;
     user_id: string;
     currency_id: string;
-    type: AccountTransactionType | string;
-    transaction_class: AccountTransactionClass | string;
+    type: AccountTransactionType;
+    transaction_class: AccountTransactionClass;
     amount: number;
     client_transaction_id?: string;
     comment?: string;

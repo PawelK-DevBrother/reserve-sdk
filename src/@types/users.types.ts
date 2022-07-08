@@ -33,7 +33,7 @@ export enum SortDirection {
     DESC,
 }
 
-interface DateRangeInput {
+export interface DateRangeInput {
     time_from?: String;
     time_to?: String;
 }
@@ -42,7 +42,7 @@ interface PagerInput {
     offset?: number;
 }
 interface SortInput {
-    direction: SortDirection | string;
+    direction: SortDirection;
 }
 
 export interface GetUsersFilterArgs {

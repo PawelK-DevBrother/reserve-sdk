@@ -2,6 +2,7 @@
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
+import {GetInstrumentsArgs, Instrument} from './@types/instrument.types';
 import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
@@ -13,6 +14,7 @@ import {
     CreateConversionOrderArgs,
     Conversion,
 } from './@types/conversion.types';
+import {config} from './config';
 
 export class Reserve_SDK {
     private gql_client: GraphQLClient;
@@ -27,17 +29,22 @@ export class Reserve_SDK {
     }
     private async gql_request(body: string, variables: Variables = undefined) {
         return this.gql_client.request(body, variables, {authorization: `Bearer ${this.auth_token}`}).catch((e) => {
-            throw new GraphQlCustomError(
-                e.response.errors[0].message,
-                e.response.status,
-                e.request.query,
-                e.request.variables,
-            );
+            try {
+                const error_body = {
+                    msg: e.response.errors[0].message,
+                    statusCode: e.response.status,
+                    query: e.request.query,
+                    variables: e.request.variables,
+                };
+                throw new GraphQlCustomError(error_body);
+            } catch (error) {
+                if (error instanceof GraphQlCustomError) throw error;
+            }
+            throw e;
         });
     }
 
     /**
-     * **ASYNC** `healthcheck` method allows to perform healtcheck request
      * * ### Usage
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
@@ -398,6 +405,77 @@ export class Reserve_SDK {
         const {create_account_transaction} = await this.gql_request(mutation, args);
         return create_account_transaction;
     }
+
+    async get_instruments(args?: GetInstrumentsArgs): Promise<Instrument[]> {
+        const defaultArgs = {periodicity: 'day', limit: 1};
+
+        const query = gql`
+            query ($periodicity: InstrumentHistoryPeriodicity!, $limit: Int, $date_range: DateRangeInput) {
+                instruments {
+                    name
+                    instrument_id
+                    base_currency_id
+                    quote_currency_id
+                    price_decimals
+                    min_quantity
+                    max_quantity
+                    min_quote_quantity
+                    max_quote_quantity
+                    price_bars(periodicity: $periodicity, limit: $limit, date_range: $date_range) {
+                        instrument_id
+                        high
+                        low
+                        open
+                        close
+                        volume_from
+                        volume_to
+                        ts
+                        ts_iso
+                    }
+                    recent_price_bar(periodicity: $periodicity) {
+                        instrument_id
+                        high
+                        low
+                        open
+                        close
+                        volume_from
+                        volume_to
+                        ts
+                        ts_iso
+                    }
+                    base_currency {
+                        currency_id
+                        type
+                        precision
+                    }
+                    quote_currency {
+                        currency_id
+                        type
+                        precision
+                    }
+                    trading_fees {
+                        instrument_id
+                        fee_group_id
+                        maker_progressive
+                        taker_progressive
+                        maker_flat
+                        taker_flat
+                    }
+                    price {
+                        instrument_id
+                        ask
+                        bid
+                        price_24h_change
+                        ts
+                        ts_iso
+                    }
+                }
+            }
+        `;
+        const {instruments} = await this.gql_request(query, {...defaultArgs, ...args});
+
+        return instruments;
+    }
 }
 
 export * from './config';
@@ -405,6 +483,15 @@ export * from './utils';
 export * from './@types/users.types';
 export * from './@types/utils.types';
 export * from './@types/accounts.types';
+export * from './@types/instrument.types';
 export * from './@types/conversion.types';
 export * from './@types/demo.signin.types';
 export * from './@types/transactions.types';
+
+// const main = async () => {
+//     const sdk = new Reserve_SDK(config.graphQL.endpoint);
+
+//     console.log(await sdk.get_instruments());
+// };
+
+// main();
