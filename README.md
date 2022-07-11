@@ -47,6 +47,8 @@ const users = await Sdk_Instance.get_users();
 - [create conversion quote](#create-conversion-quote)
 - [create conversion order](#create-conversion-order)
 - [create account transaction](#create-account-transaction)
+- [get instruments](#get-instruments)
+- [get instruments price bars](#get-instruments-price-bars)
 
 
 #### Health check
