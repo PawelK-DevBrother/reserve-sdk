@@ -50,7 +50,7 @@ const users = await Sdk_Instance.get_users();
 - [get instruments](#get-instruments)
 - [get instruments price bars](#get-instruments-price-bars)
 - [deposit_address_crypto](#deposit-address-crypto)
-- [create_fiat_withdrawal](#create-fiat-withdrawal)
+- [create_withdrawal_fiat](#create-withdrawal-fiat)
 
 
 #### Health check
@@ -247,7 +247,7 @@ import {Reserve_SDK} from 'reserve-sdk';
 
 const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
 Sdk_Instance.setAuthToken("trader_token");
-const res = await Sdk_Instance.create_fiat_withdrawal({
+const res = await Sdk_Instance.create_withdrawal_fiat({
      amount: 0.5,
      currency_id: 'USD',
      fiat_bank_bic: 'example_fiat_bank_bic',
@@ -263,7 +263,7 @@ import {Reserve_SDK} from 'reserve-sdk';
 
 const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
 Sdk_Instance.setAuthToken("admin_token")
-const res = await Sdk_Instance.create_fiat_withdrawal({
+const res = await Sdk_Instance.create_withdrawal_fiat({
      user_id: 'example_user_id',
      amount: 0.5,
      currency_id: 'USD',

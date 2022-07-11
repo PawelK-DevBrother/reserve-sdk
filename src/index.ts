@@ -604,7 +604,7 @@ export class Reserve_SDK {
     }
 
     /**
-     * **ASYNC** `create_fiat_withdrawal` method allows **AUTHENTICATED** users to create fiat withdrawals
+     * **ASYNC** `create_withdrawal_fiat` method allows **AUTHENTICATED** users to create fiat withdrawals
      * * ### Usage
      *
      * **Trader** - no **args** are required
@@ -613,7 +613,7 @@ export class Reserve_SDK {
      *
      * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("trader_token");
-     * const res = await Sdk_Instance.create_fiat_withdrawal({
+     * const res = await Sdk_Instance.create_withdrawal_fiat({
      *      amount: 0.5,
      *      currency_id: 'USD',
      *      fiat_bank_bic: 'example_fiat_bank_bic',
@@ -629,7 +629,7 @@ export class Reserve_SDK {
      *
      * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_token")
-     * const res = await Sdk_Instance.create_fiat_withdrawal({
+     * const res = await Sdk_Instance.create_withdrawal_fiat({
      *      user_id: 'example_user_id',
      *      amount: 0.5,
      *      currency_id: 'USD',
@@ -640,7 +640,7 @@ export class Reserve_SDK {
      * });
      * ```
      */
-    async create_fiat_withdrawal(args: CreateFiatWithdrawalArgs): Promise<Payment> {
+    async create_withdrawal_fiat(args: CreateFiatWithdrawalArgs): Promise<Payment> {
         const mutation = gql`
             mutation (
                 $user_id: String
