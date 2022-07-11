@@ -1,5 +1,5 @@
 import {config} from './config';
-import {CreateFiatWithdrawalArgs} from './@types/create.fiat.withdrawal.types';
+import {CreateFiatWithdrawalArgs, Payment} from './@types/create.fiat.withdrawal.types';
 // Tools
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
@@ -606,7 +606,44 @@ export class Reserve_SDK {
         return deposit_address_crypto;
     }
 
-    async create_fiat_withdrawal(args: CreateFiatWithdrawalArgs) {
+    /**
+     * **ASYNC** `create_fiat_withdrawal` method allows **AUTHENTICATED** users to create fiat withdrawals
+     * * ### Usage
+     *
+     * **Trader** - no **args** are required
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const res = await Sdk_Instance.create_fiat_withdrawal({
+     *      amount: 0.5,
+     *      currency_id: 'USD',
+     *      fiat_bank_bic: 'example_fiat_bank_bic',
+     *      fiat_bank_name: 'example_fiat_bank_name',
+     *      fiat_beneficiary_name: 'example_fiat_beneficiary_name',
+     *      fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
+     * });
+     * ```
+     *
+     * **Admin** - user_id **arg** is required
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token")
+     * const res = await Sdk_Instance.create_fiat_withdrawal({
+     *      user_id: 'example_user_id',
+     *      amount: 0.5,
+     *      currency_id: 'USD',
+     *      fiat_bank_bic: 'example_fiat_bank_bic',
+     *      fiat_bank_name: 'example_fiat_bank_name',
+     *      fiat_beneficiary_name: 'example_fiat_beneficiary_name',
+     *      fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
+     * });
+     * ```
+     */
+    async create_fiat_withdrawal(args: CreateFiatWithdrawalArgs): Promise<Payment> {
         const mutation = gql`
             mutation (
                 $user_id: String
@@ -638,7 +675,38 @@ export class Reserve_SDK {
                     fiat_reference: $fiat_reference
                     fiat_notes: $fiat_notes
                 ) {
+                    payment_id
+                    user_id
+                    currency_id
                     amount
+                    type
+                    psp_service_id
+                    crypto_transaction_id
+                    crypto_address
+                    crypto_address_tag_type
+                    crypto_address_tag_value
+                    crypto_network
+                    fiat_bank_name
+                    fiat_bank_address
+                    fiat_bank_bic
+                    fiat_routing_number
+                    fiat_reference
+                    fiat_notes
+                    fiat_beneficiary_name
+                    fiat_beneficiary_account_number
+                    fiat_beneficiary_address_line_1
+                    fiat_beneficiary_address_line_2
+                    status
+                    approval_status
+                    body_amount
+                    fee_amount
+                    record_account_transaction_id
+                    revert_account_transaction_id
+                    ip_address
+                    message
+                    error_message
+                    created_at
+                    updated_at
                 }
             }
         `;
@@ -661,10 +729,8 @@ const main = async () => {
     const Sdk_Instance = new Reserve_SDK(config.graphQL.endpoint);
 
     Sdk_Instance.setAuthToken(config.auth.trader_token);
-    Sdk_Instance.setAuthToken(config.auth.admin_token);
 
     const res = await Sdk_Instance.create_fiat_withdrawal({
-        // user_id: 'example_user_id',
         amount: 0.5,
         currency_id: 'USD',
         fiat_bank_bic: 'example_fiat_bank_bic',

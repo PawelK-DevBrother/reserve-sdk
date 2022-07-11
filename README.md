@@ -50,6 +50,7 @@ const users = await Sdk_Instance.get_users();
 - [get instruments](#get-instruments)
 - [get instruments price bars](#get-instruments-price-bars)
 - [deposit_address_crypto](#deposit-address-crypto)
+- [create_fiat_withdrawal](#create-fiat-withdrawal)
 
 
 #### Health check
@@ -206,5 +207,69 @@ const res = await Sdk_Instance.get_instrument_price_bars({
     instrument_id: 'BTCUSDT',
     periodicity: InstrumentHistoryPeriodicity.day,
     limit: 3,
+});
+```
+
+#### Deposit address crypto
+
+##### Allows **AUTHENTICATED** users to create new deposits
+
+**Trader** - no **args** are required
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("trader_token");
+const res = await Sdk_Instance.deposit_address_crypto({network: 'example_network', currency_id: 'BTC'});
+```
+
+**Admin** - user_id **arg** is required
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("admin_token")
+const res = await Sdk_Instance.deposit_address_crypto({
+    currency_id: 'BTC',
+    user_id: 'example_user_id',
+    network: 'example_network',
+});
+```
+
+#### Create fiat withdrawal
+
+##### Allows **AUTHENTICATED** users to create fiat withdrawals
+
+
+**Trader** - no **args** are required
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("trader_token");
+const res = await Sdk_Instance.create_fiat_withdrawal({
+     amount: 0.5,
+     currency_id: 'USD',
+     fiat_bank_bic: 'example_fiat_bank_bic',
+     fiat_bank_name: 'example_fiat_bank_name',
+     fiat_beneficiary_name: 'example_fiat_beneficiary_name',
+     fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
+});
+```
+
+**Admin** - user_id **arg** is required
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("admin_token")
+const res = await Sdk_Instance.create_fiat_withdrawal({
+     user_id: 'example_user_id',
+     amount: 0.5,
+     currency_id: 'USD',
+     fiat_bank_bic: 'example_fiat_bank_bic',
+     fiat_bank_name: 'example_fiat_bank_name',
+     fiat_beneficiary_name: 'example_fiat_beneficiary_name',
+     fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
 });
 ```
