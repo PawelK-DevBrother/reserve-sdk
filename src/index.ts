@@ -6,7 +6,7 @@ import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
 import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
-import {DepositAddressCryptoArgs} from './@types/deposit.address.crypto.types';
+import {DepositAddressCrypto, DepositAddressCryptoArgs} from './@types/deposit.address.crypto.types';
 import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
@@ -37,6 +37,7 @@ export class Reserve_SDK {
     private async gql_request(body: string, variables: Variables = undefined) {
         return this.gql_client.request(body, variables, {authorization: `Bearer ${this.auth_token}`}).catch((e) => {
             try {
+                console.log(e);
                 const error_body = {
                     msg: e.response.errors[0].message,
                     statusCode: e.response.status,
@@ -502,10 +503,6 @@ export class Reserve_SDK {
         return instruments;
     }
 
-    //flag
-    //price changes
-    //functions for deposit/withdrawals
-
     /**
      * **ASYNC** `get_instrument_price_bars` method allows to get detailed price bars data about specified instrument
      * * ### Usage
@@ -584,7 +581,7 @@ export class Reserve_SDK {
      * });
      * ```
      */
-    async deposit_address_crypto(args: DepositAddressCryptoArgs) {
+    async deposit_address_crypto(args: DepositAddressCryptoArgs): Promise<DepositAddressCrypto> {
         const query = gql`
             query ($user_id: String, $network: String!, $currency_id: String!) {
                 deposit_address_crypto(user_id: $user_id, network: $network, currency_id: $currency_id) {
@@ -680,7 +677,6 @@ export class Reserve_SDK {
                     currency_id
                     amount
                     type
-                    psp_service_id
                     crypto_transaction_id
                     crypto_address
                     crypto_address_tag_type
@@ -698,8 +694,6 @@ export class Reserve_SDK {
                     fiat_beneficiary_address_line_2
                     status
                     approval_status
-                    body_amount
-                    fee_amount
                     record_account_transaction_id
                     revert_account_transaction_id
                     ip_address
@@ -707,16 +701,19 @@ export class Reserve_SDK {
                     error_message
                     created_at
                     updated_at
+                    psp_service_id
+                    body_amount
+                    fee_amount
                 }
             }
         `;
-        const res = await this.gql_request(mutation, args);
-        return res;
+        const {create_withdrawal_fiat} = await this.gql_request(mutation, args);
+        return create_withdrawal_fiat;
     }
 }
 
-export * from './config';
 export * from './utils';
+export * from './config';
 export * from './@types/users.types';
 export * from './@types/utils.types';
 export * from './@types/accounts.types';
@@ -724,21 +721,5 @@ export * from './@types/instrument.types';
 export * from './@types/conversion.types';
 export * from './@types/demo.signin.types';
 export * from './@types/transactions.types';
-
-const main = async () => {
-    const Sdk_Instance = new Reserve_SDK(config.graphQL.endpoint);
-
-    Sdk_Instance.setAuthToken(config.auth.trader_token);
-
-    const res = await Sdk_Instance.create_fiat_withdrawal({
-        amount: 0.5,
-        currency_id: 'USD',
-        fiat_bank_bic: 'example_fiat_bank_bic',
-        fiat_bank_name: 'example_fiat_bank_name',
-        fiat_beneficiary_name: 'example_fiat_beneficiary_name',
-        fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
-    });
-    console.log(res);
-};
-
-main();
+export * from './@types/deposit.address.crypto.types';
+export * from './@types/create.fiat.withdrawal.types';
