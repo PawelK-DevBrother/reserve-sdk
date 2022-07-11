@@ -455,6 +455,7 @@ export class Reserve_SDK {
                         close
                         volume_from
                         volume_to
+                        price_24h_change
                         ts
                         ts_iso
                     }
@@ -466,6 +467,7 @@ export class Reserve_SDK {
                         close
                         volume_from
                         volume_to
+                        price_24h_change
                         ts
                         ts_iso
                     }
@@ -545,13 +547,13 @@ export class Reserve_SDK {
                     close
                     volume_from
                     volume_to
+                    price_24h_change
                     ts
                     ts_iso
                 }
             }
         `;
         const {instrument_price_bars} = await this.gql_request(query, {...defaultArgs, ...args});
-
         return instrument_price_bars;
     }
 

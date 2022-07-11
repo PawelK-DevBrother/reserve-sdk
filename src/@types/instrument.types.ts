@@ -44,6 +44,7 @@ export interface InstrumentPriceHistory {
     close: number;
     volume_from: number;
     volume_to: number;
+    price_24h_change?: number;
     ts: string;
     ts_iso: string;
 }
