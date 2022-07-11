@@ -8,7 +8,7 @@ enum ConversionStatus {
     rejected = 'rejected',
 }
 
-export interface CreateConverstionQuoteArgs {
+export interface CreateConversionQuoteArgs {
     user_id?: string;
     source_currency_id: string;
     target_currency_id: string;

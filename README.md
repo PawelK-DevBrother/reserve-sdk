@@ -10,7 +10,7 @@ npm i reserve-sdk
 
 ## Usage
 
-### Config variables
+<!-- ### Config variables
 
 Config variables are automatically loaded from .env file. See `.env.example` for reference
 
@@ -34,7 +34,7 @@ const res = await Sdk_Instance.checkin();
 
 Sdk_Instance.setAuthToken(config.auth.admin_token);
 const users = await Sdk_Instance.get_users();
-```
+``` -->
 
 ### Methods
 
@@ -49,6 +49,7 @@ const users = await Sdk_Instance.get_users();
 - [create account transaction](#create-account-transaction)
 - [get instruments](#get-instruments)
 - [get instruments price bars](#get-instruments-price-bars)
+- [deposit_address_crypto](#deposit-address-crypto)
 
 
 #### Health check

@@ -1,16 +1,24 @@
+import {config} from './config';
+import {CreateFiatWithdrawalArgs} from './@types/create.fiat.withdrawal.types';
 // Tools
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
 import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
+import {DepositAddressCryptoArgs} from './@types/deposit.address.crypto.types';
 import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
-import {GetInstrumentsArgs, Instrument, GetInstrumentPriceBarsArgs} from './@types/instrument.types';
+import {
+    GetInstrumentsArgs,
+    Instrument,
+    GetInstrumentPriceBarsArgs,
+    InstrumentPriceHistory,
+} from './@types/instrument.types';
 import {
     CreateConversionQuoteResult,
-    CreateConverstionQuoteArgs as CreateConversionQuoteArgs,
+    CreateConversionQuoteArgs,
     CreateConversionOrderArgs,
     Conversion,
 } from './@types/conversion.types';
@@ -416,6 +424,10 @@ export class Reserve_SDK {
      * const res = await Sdk_Instance.get_instruments({
      *   periodicity: InstrumentHistoryPeriodicity['day'],
      *   limit: 3,
+     *    data_range: {
+     *       time_from: '2022-07-06 16:20:01',
+     *       time_to: '2022-07-06 18:40:05',
+     *    }
      * });
      * ```
      */
@@ -490,6 +502,10 @@ export class Reserve_SDK {
         return instruments;
     }
 
+    //flag
+    //price changes
+    //functions for deposit/withdrawals
+
     /**
      * **ASYNC** `get_instrument_price_bars` method allows to get detailed price bars data about specified instrument
      * * ### Usage
@@ -502,10 +518,14 @@ export class Reserve_SDK {
      *    instrument_id: 'BTCUSDT',
      *    periodicity: InstrumentHistoryPeriodicity.day,
      *    limit: 3,
+     *    data_range: {
+     *       time_from: '2022-07-06 16:20:01',
+     *       time_to: '2022-07-06 18:40:05',
+     *    }
      * });
      * ```
      */
-    async get_instrument_price_bars(args: GetInstrumentPriceBarsArgs) {
+    async get_instrument_price_bars(args: GetInstrumentPriceBarsArgs): Promise<InstrumentPriceHistory[]> {
         const defaultArgs = {periodicity: 'day', limit: 1000};
 
         const query = gql`
@@ -534,7 +554,96 @@ export class Reserve_SDK {
             }
         `;
         const {instrument_price_bars} = await this.gql_request(query, {...defaultArgs, ...args});
+
         return instrument_price_bars;
+    }
+
+    /**
+     * **ASYNC** `deposit_address_crypto` method allows **AUTHENTICATED** users to create new deposits
+     * * ### Usage
+     *
+     * **Trader** - no **args** are required
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const res = await Sdk_Instance.deposit_address_crypto({network: 'example_network', currency_id: 'BTC'});
+     * ```
+     *
+     * **Admin** - user_id **arg** is required
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token")
+     * const res = await Sdk_Instance.deposit_address_crypto({
+     *     currency_id: 'BTC',
+     *     user_id: 'example_user_id',
+     *     network: 'example_network',
+     * });
+     * ```
+     */
+    async deposit_address_crypto(args: DepositAddressCryptoArgs) {
+        const query = gql`
+            query ($user_id: String, $network: String!, $currency_id: String!) {
+                deposit_address_crypto(user_id: $user_id, network: $network, currency_id: $currency_id) {
+                    deposit_address_crypto_id
+                    user_id
+                    currency_id
+                    address
+                    address_tag_type
+                    address_tag_value
+                    network
+                    psp_service_id
+                    created_at
+                    updated_at
+                }
+            }
+        `;
+
+        const {deposit_address_crypto} = await this.gql_request(query, args);
+        return deposit_address_crypto;
+    }
+
+    async create_fiat_withdrawal(args: CreateFiatWithdrawalArgs) {
+        const mutation = gql`
+            mutation (
+                $user_id: String
+                $amount: Float!
+                $currency_id: String!
+                $fiat_bank_name: String!
+                $fiat_bank_bic: String!
+                $fiat_beneficiary_name: String!
+                $fiat_beneficiary_account_number: String!
+                $fiat_beneficiary_address_line_1: String
+                $fiat_beneficiary_address_line_2: String
+                $fiat_bank_address: String
+                $fiat_routing_number: String
+                $fiat_reference: String
+                $fiat_notes: String
+            ) {
+                create_withdrawal_fiat(
+                    user_id: $user_id
+                    amount: $amount
+                    currency_id: $currency_id
+                    fiat_bank_name: $fiat_bank_name
+                    fiat_bank_bic: $fiat_bank_bic
+                    fiat_beneficiary_name: $fiat_beneficiary_name
+                    fiat_beneficiary_account_number: $fiat_beneficiary_account_number
+                    fiat_beneficiary_address_line_1: $fiat_beneficiary_address_line_1
+                    fiat_beneficiary_address_line_2: $fiat_beneficiary_address_line_2
+                    fiat_bank_address: $fiat_bank_address
+                    fiat_routing_number: $fiat_routing_number
+                    fiat_reference: $fiat_reference
+                    fiat_notes: $fiat_notes
+                ) {
+                    amount
+                }
+            }
+        `;
+        const res = await this.gql_request(mutation, args);
+        return res;
     }
 }
 
@@ -547,3 +656,23 @@ export * from './@types/instrument.types';
 export * from './@types/conversion.types';
 export * from './@types/demo.signin.types';
 export * from './@types/transactions.types';
+
+const main = async () => {
+    const Sdk_Instance = new Reserve_SDK(config.graphQL.endpoint);
+
+    Sdk_Instance.setAuthToken(config.auth.trader_token);
+    Sdk_Instance.setAuthToken(config.auth.admin_token);
+
+    const res = await Sdk_Instance.create_fiat_withdrawal({
+        // user_id: 'example_user_id',
+        amount: 0.5,
+        currency_id: 'USD',
+        fiat_bank_bic: 'example_fiat_bank_bic',
+        fiat_bank_name: 'example_fiat_bank_name',
+        fiat_beneficiary_name: 'example_fiat_beneficiary_name',
+        fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
+    });
+    console.log(res);
+};
+
+main();
