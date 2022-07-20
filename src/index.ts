@@ -1,4 +1,3 @@
-import {config} from './config';
 import {CreateFiatWithdrawalArgs, Payment} from './@types/create.fiat.withdrawal.types';
 // Tools
 import {GraphQlCustomError} from './utils';
