@@ -7,11 +7,9 @@ export enum PaymentType {
 
 export enum PaymentStatus {
     new = 'new',
-    pending = 'pending',
-    rejected = 'rejected',
     processing = 'processing',
+    rejected = 'rejected',
     completed = 'completed',
-    failed = 'failed',
 }
 
 export enum PaymentApprovalStatus {

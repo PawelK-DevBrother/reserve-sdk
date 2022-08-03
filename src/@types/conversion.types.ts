@@ -1,3 +1,4 @@
+import {PagerSortDateRange} from './users.types';
 interface EstimateOrderFee {
     currency_id: string;
     amount: number;
@@ -14,6 +15,14 @@ export interface CreateConversionQuoteArgs {
     target_currency_id: string;
     source_currency_amount?: number;
     target_currency_amount?: number;
+}
+
+export interface GetConversionArgs extends PagerSortDateRange {
+    user_id?: string;
+    search?: string;
+    conversion_quote_id?: string;
+    source_currency_id?: string;
+    target_currency_id?: string;
 }
 
 export interface CreateConversionQuoteResult {

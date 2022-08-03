@@ -1,3 +1,4 @@
+import {GetPaymentsHistoryArgs} from './@types/payments.types';
 import {CreateFiatWithdrawalArgs, Payment} from './@types/create.fiat.withdrawal.types';
 // Tools
 import {GraphQlCustomError} from './utils';
@@ -9,32 +10,32 @@ import {DepositAddressCrypto, DepositAddressCryptoArgs} from './@types/deposit.a
 import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
-import {
-    GetInstrumentsArgs,
-    Instrument,
-    GetInstrumentPriceBarsArgs,
-    InstrumentPriceHistory,
-} from './@types/instrument.types';
-import {
-    CreateConversionQuoteResult,
-    CreateConversionQuoteArgs,
-    CreateConversionOrderArgs,
-    Conversion,
-} from './@types/conversion.types';
+import {GetInstrumentsArgs, Instrument, GetInstrumentPriceBarsArgs, InstrumentPriceHistory} from './@types/instrument.types';
+import {CreateConversionQuoteResult, CreateConversionQuoteArgs, CreateConversionOrderArgs, Conversion, GetConversionArgs} from './@types/conversion.types';
 
 export class Reserve_SDK {
     private gql_client: GraphQLClient;
-    private auth_token: string;
+    private headers: {[x: string]: string} = {};
 
     constructor(endpoint: string) {
         this.gql_client = new GraphQLClient(endpoint);
     }
 
     setAuthToken(token: string): void {
-        this.auth_token = token;
+        this.headers['authorization'] = `Bearer ${token}`;
     }
+    setXReserveAuth(value: any): void {
+        this.headers['x-reserve-auth'] = value;
+    }
+    setCustomHeader(header_name: string, value: any): void {
+        this.headers[header_name] = value;
+    }
+    getHeaders() {
+        return this.headers;
+    }
+
     private async gql_request(body: string, variables: Variables = undefined) {
-        return this.gql_client.request(body, variables, {authorization: `Bearer ${this.auth_token}`}).catch((e) => {
+        return this.gql_client.request(body, variables, this.headers).catch((e) => {
             try {
                 console.log(e);
                 const error_body = {
@@ -164,13 +165,7 @@ export class Reserve_SDK {
         };
 
         const query = gql`
-            query (
-                $username: String
-                $email: String
-                $pager: PagerInput
-                $sort: SortInput
-                $dateRange: DateRangeInput
-            ) {
+            query ($username: String, $email: String, $pager: PagerInput, $sort: SortInput, $dateRange: DateRangeInput) {
                 users(username: $username, email: $email, pager: $pager, sort: $sort, dateRange: $dateRange) {
                     serial_id
                     user_id
@@ -262,13 +257,7 @@ export class Reserve_SDK {
      */
     async create_conversion_quote(args: CreateConversionQuoteArgs): Promise<CreateConversionQuoteResult> {
         const mutation = gql`
-            mutation (
-                $user_id: String
-                $source_currency_id: String!
-                $target_currency_id: String!
-                $source_currency_amount: Float!
-                $target_currency_amount: Float
-            ) {
+            mutation ($user_id: String, $source_currency_id: String!, $target_currency_id: String!, $source_currency_amount: Float!, $target_currency_amount: Float) {
                 create_conversion_quote(
                     user_id: $user_id
                     source_currency_id: $source_currency_id
@@ -311,18 +300,8 @@ export class Reserve_SDK {
         const defaultArgs = {return_on_complete: true};
 
         const mutation = gql`
-            mutation (
-                $user_id: String
-                $reference: String
-                $return_on_complete: Boolean!
-                $conversion_quote_id: String!
-            ) {
-                create_conversion_order(
-                    user_id: $user_id
-                    reference: $reference
-                    return_on_complete: $return_on_complete
-                    conversion_quote_id: $conversion_quote_id
-                ) {
+            mutation ($user_id: String, $reference: String, $return_on_complete: Boolean!, $conversion_quote_id: String!) {
+                create_conversion_order(user_id: $user_id, reference: $reference, return_on_complete: $return_on_complete, conversion_quote_id: $conversion_quote_id) {
                     conversion_id
                     conversion_quote_id
                     reference
@@ -424,7 +403,7 @@ export class Reserve_SDK {
      * const res = await Sdk_Instance.get_instruments({
      *   periodicity: InstrumentHistoryPeriodicity['day'],
      *   limit: 3,
-     *    data_range: {
+     *    date_range: {
      *       time_from: '2022-07-06 16:20:01',
      *       time_to: '2022-07-06 18:40:05',
      *    }
@@ -516,7 +495,7 @@ export class Reserve_SDK {
      *    instrument_id: 'BTCUSDT',
      *    periodicity: InstrumentHistoryPeriodicity.day,
      *    limit: 3,
-     *    data_range: {
+     *    date_range: {
      *       time_from: '2022-07-06 16:20:01',
      *       time_to: '2022-07-06 18:40:05',
      *    }
@@ -527,18 +506,8 @@ export class Reserve_SDK {
         const defaultArgs = {periodicity: 'day', limit: 1000};
 
         const query = gql`
-            query (
-                $instrument_id: String!
-                $periodicity: InstrumentHistoryPeriodicity!
-                $limit: Int
-                $date_range: DateRangeInput
-            ) {
-                instrument_price_bars(
-                    instrument_id: $instrument_id
-                    periodicity: $periodicity
-                    limit: $limit
-                    date_range: $date_range
-                ) {
+            query ($instrument_id: String!, $periodicity: InstrumentHistoryPeriodicity!, $limit: Int, $date_range: DateRangeInput) {
+                instrument_price_bars(instrument_id: $instrument_id, periodicity: $periodicity, limit: $limit, date_range: $date_range) {
                     instrument_id
                     high
                     low
@@ -560,7 +529,7 @@ export class Reserve_SDK {
      * **ASYNC** `deposit_address_crypto` method allows **AUTHENTICATED** users to create new deposits
      * * ### Usage
      *
-     * **Trader** - no **args** are required
+     * **Trader**
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -608,7 +577,7 @@ export class Reserve_SDK {
      * **ASYNC** `create_withdrawal_fiat` method allows **AUTHENTICATED** users to create fiat withdrawals
      * * ### Usage
      *
-     * **Trader** - no **args** are required
+     * **Trader**
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -711,10 +680,182 @@ export class Reserve_SDK {
         const {create_withdrawal_fiat} = await this.gql_request(mutation, args);
         return create_withdrawal_fiat;
     }
+
+    /**
+     * **ASYNC** `get_conversions` method allows **AUTHENTICATED** users to get conversions history
+     * * ### Usage
+     *
+     * **Trader**
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const res = await Sdk_Instance.get_conversions({
+     *    source_currency_id: 'BTC',
+     *    target_currency_id: 'ETH',
+     *    pager: {limit:3,offset:1},
+     *    dateRange: {
+     *       time_from: '2022-07-28 16:20:01',
+     *       time_to: '2022-08-02 18:40:05',
+     *    }
+     * });
+     * ```
+     *
+     * **Admin**
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token")
+     * const res = await Sdk_Instance.get_conversions({
+     *    user_id:'example_user_id',
+     *    source_currency_id: 'BTC',
+     *    target_currency_id: 'ETH',
+     *    pager: {limit:3,offset:1},
+     *    dateRange: {
+     *       time_from: '2022-07-28 16:20:01',
+     *       time_to: '2022-08-02 18:40:05',
+     *    }
+     * });
+     * ```
+     */
+    async get_conversions(args?: GetConversionArgs): Promise<Conversion[]> {
+        const query = gql`
+            query (
+                $user_id: String
+                $search: String
+                $conversion_quote_id: String
+                $source_currency_id: String
+                $target_currency_id: String
+                $pager: PagerInput
+                $sort: SortInput
+                $dateRange: DateRangeInput
+            ) {
+                conversions(
+                    user_id: $user_id
+                    search: $search
+                    conversion_quote_id: $conversion_quote_id
+                    source_currency_id: $source_currency_id
+                    target_currency_id: $target_currency_id
+                    pager: $pager
+                    sort: $sort
+                    dateRange: $dateRange
+                ) {
+                    conversion_id
+                    conversion_quote_id
+                    reference
+                    source_currency_id
+                    source_currency_amount
+                    target_currency_id
+                    target_currency_amount
+                    fee_currency_id
+                    fee_currency_amount
+                    price
+                    status
+                    user_id
+                    parent_transaction_id
+                    message
+                    error_message
+                    created_at
+                    updated_at
+                    created_at_iso
+                    updated_at_iso
+                }
+            }
+        `;
+
+        const {conversions} = await this.gql_request(query, args);
+        return conversions;
+    }
+
+    /**
+     * **ASYNC** `get_payments` method allows **AUTHENTICATED** users to get payments history
+     * * ### Usage
+     *
+     * **Trader**
+     * ```ts
+     * import {Reserve_SDK,PaymentType,PaymentStatus} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const res = await Sdk_Instance.get_payments({
+     *    currency_id: 'ETH',
+     *    type: PaymentType.deposit,
+     *    status: [PaymentStatus.completed, PaymentStatus.rejected],
+     *    pager: {limit:3,offset:1},
+     *    dateRange: {
+     *       time_from: '2022-07-28 16:20:01',
+     *       time_to: '2022-08-02 18:40:05',
+     *    }
+     * });
+     * ```
+     *
+     * **Admin**
+     * ```ts
+     * import {Reserve_SDK,PaymentType,PaymentStatus} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token");
+     * const res = await Sdk_Instance.get_payments({
+     *    user_id: 'example_user_id',
+     *    currency_id: 'ETH',
+     *    type: PaymentType.deposit,
+     *    status: [PaymentStatus.completed, PaymentStatus.rejected],
+     *    pager: {limit:3,offset:1},
+     *    dateRange: {
+     *       time_from: '2022-07-28 16:20:01',
+     *       time_to: '2022-08-02 18:40:05',
+     *    }
+     * });
+     * ```
+     */
+    async get_payments(args?: GetPaymentsHistoryArgs): Promise<Payment[]> {
+        const query = gql`
+            query ($payment_id: String, $currency_id: String, $type: PaymentType, $user_id: String, $search: String, $status: [PaymentStatus!]) {
+                payments(payment_id: $payment_id, currency_id: $currency_id, type: $type, user_id: $user_id, search: $search, status: $status) {
+                    payment_id
+                    user_id
+                    currency_id
+                    amount
+                    type
+                    crypto_transaction_id
+                    crypto_address
+                    crypto_address_tag_type
+                    crypto_address_tag_value
+                    crypto_network
+                    fiat_bank_name
+                    fiat_bank_address
+                    fiat_bank_bic
+                    fiat_routing_number
+                    fiat_reference
+                    fiat_notes
+                    fiat_beneficiary_name
+                    fiat_beneficiary_account_number
+                    fiat_beneficiary_address_line_1
+                    fiat_beneficiary_address_line_2
+                    status
+                    approval_status
+                    record_account_transaction_id
+                    revert_account_transaction_id
+                    ip_address
+                    message
+                    error_message
+                    created_at
+                    updated_at
+                    psp_service_id
+                    body_amount
+                    fee_amount
+                }
+            }
+        `;
+
+        const {payments} = await this.gql_request(query, args);
+        return payments;
+    }
 }
 
 export * from './utils';
-export * from './config';
 export * from './@types/users.types';
 export * from './@types/utils.types';
 export * from './@types/accounts.types';
@@ -724,3 +865,4 @@ export * from './@types/demo.signin.types';
 export * from './@types/transactions.types';
 export * from './@types/deposit.address.crypto.types';
 export * from './@types/create.fiat.withdrawal.types';
+export * from './@types/payments.types';

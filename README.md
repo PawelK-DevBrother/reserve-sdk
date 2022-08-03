@@ -10,6 +10,23 @@ npm i reserve-sdk
 
 ## Usage
 
+
+### Custom headers
+
+```ts
+Sdk_Instance.setAuthToken('auth_token')
+
+Sdk_Instance.setXReserveAuth('x_reserve_auth_value');
+
+console.log(Sdk_Instance.getHeaders());
+
+Sdk_Instance.setCustomHeader('x-reserve-auth', 'value');
+
+Sdk_Instance.setCustomHeader('custom_header', 'custom_value');
+
+console.log(Sdk_Instance.getHeaders());
+```
+
 <!-- ### Config variables
 
 Config variables are automatically loaded from .env file. See `.env.example` for reference
@@ -51,6 +68,8 @@ const users = await Sdk_Instance.get_users();
 - [get instruments price bars](#get-instruments-price-bars)
 - [deposit_address_crypto](#deposit-address-crypto)
 - [create_withdrawal_fiat](#create-withdrawal-fiat)
+- [get_conversions](#get-converions)
+- [get_payments](#get-payments)
 
 
 #### Health check
@@ -214,7 +233,7 @@ const res = await Sdk_Instance.get_instrument_price_bars({
 
 ##### Allows **AUTHENTICATED** users to create new deposits
 
-**Trader** - no **args** are required
+**Trader**
 ```ts
 import {Reserve_SDK} from 'reserve-sdk';
 
@@ -241,7 +260,7 @@ const res = await Sdk_Instance.deposit_address_crypto({
 ##### Allows **AUTHENTICATED** users to create fiat withdrawals
 
 
-**Trader** - no **args** are required
+**Trader** 
 ```ts
 import {Reserve_SDK} from 'reserve-sdk';
 
@@ -273,3 +292,83 @@ const res = await Sdk_Instance.create_withdrawal_fiat({
      fiat_beneficiary_account_number: 'example_fiat_beneficiary_account_number',
 });
 ```
+
+
+#### Get conversions
+
+##### Allows **AUTHENTICATED** users to get conversions history
+     
+**Trader** 
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+     
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("trader_token");
+const res = await Sdk_Instance.get_conversions({
+   source_currency_id: 'BTC',
+   target_currency_id: 'ETH',
+   pager: {limit:3,offset:1},
+   dateRange: {
+      time_from: '2022-07-28 16:20:01',
+      time_to: '2022-08-02 18:40:05',
+   }
+});
+```
+     
+**Admin** 
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+     
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("admin_token")
+const res = await Sdk_Instance.get_conversions({
+   user_id:'example_user_id',
+   source_currency_id: 'BTC',
+   target_currency_id: 'ETH',
+   pager: {limit:3,offset:1},
+   dateRange: {
+      time_from: '2022-07-28 16:20:01',
+      time_to: '2022-08-02 18:40:05',
+   }
+});
+```
+
+#### Get payments
+
+##### Allows **AUTHENTICATED** users to get payments history
+
+**Trader**
+```ts
+import {Reserve_SDK,PaymentType,PaymentStatus} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("trader_token");
+const res = await Sdk_Instance.get_payments({
+        currency_id: 'ETH',
+        type: PaymentType.deposit,
+        status: [PaymentStatus.completed, PaymentStatus.rejected],
+        pager: {limit:3,offset:1},
+        dateRange: {
+        time_from: '2022-07-28 16:20:01',
+        time_to: '2022-08-02 18:40:05',
+    }
+});
+```
+
+**Admin**
+```ts
+import {Reserve_SDK,PaymentType,PaymentStatus} from 'reserve-sdk';
+
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+Sdk_Instance.setAuthToken("admin_token");
+const res = await Sdk_Instance.get_payments({
+        user_id: 'example_user_id',
+        currency_id: 'ETH',
+        type: PaymentType.deposit,
+        status: [PaymentStatus.completed, PaymentStatus.rejected],
+        pager: {limit:3,offset:1},
+        dateRange: {
+        time_from: '2022-07-28 16:20:01',
+        time_to: '2022-08-02 18:40:05',
+    }
+});

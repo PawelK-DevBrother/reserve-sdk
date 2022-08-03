@@ -75,7 +75,7 @@ export interface InstrumentPrice {
 
 export interface GetInstrumentsArgs {
     limit?: number;
-    data_range?: DateRangeInput;
+    date_range?: DateRangeInput;
     periodicity?: InstrumentHistoryPeriodicity;
 }
 

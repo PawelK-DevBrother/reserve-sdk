@@ -45,11 +45,16 @@ interface SortInput {
     direction: SortDirection;
 }
 
-export interface GetUsersFilterArgs {
+export interface PagerSortDateRange {
+    pager?: PagerInput;
+    sort?: SortInput;
+    dateRange?: DateRangeInput;
+}
+
+export interface GetUsersFilterArgs extends PagerSortDateRange {
     username?: string;
     email?: string;
     user_id?: string;
     pager?: PagerInput;
     sort?: SortInput;
-    dateRange?: DateRangeInput;
 }
