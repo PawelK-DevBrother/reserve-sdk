@@ -13,7 +13,7 @@ export interface CreateConversionQuoteArgs {
     user_id?: string;
     source_currency_id: string;
     target_currency_id: string;
-    source_currency_amount: number;
+    source_currency_amount?: number;
     target_currency_amount?: number;
 }
 
