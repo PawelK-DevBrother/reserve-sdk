@@ -76,6 +76,7 @@ export class Reserve_SDK {
     /**
      * **ASYNC** `checkin` method allows **AUTHENTICATED** users to perform check-in request
      * * ### Usage
+     *
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -97,6 +98,7 @@ export class Reserve_SDK {
     /**
      * **ASYNC** `trader_demo_signin` method allows to obtain demo **TRADER** authentication token for specified username
      * * ### Usage
+     *
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -121,6 +123,7 @@ export class Reserve_SDK {
     /**
      * **ASYNC** `admin_demo_signin` method allows to obtain demo **ADMIN** authentication token for specified username
      * * ### Usage
+     *
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -145,6 +148,7 @@ export class Reserve_SDK {
     /**
      * **ASYNC** `get_users` method allows ADMINS to get users that can be filtered by multiple parameters
      * * ### Usage
+     *
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
@@ -257,7 +261,7 @@ export class Reserve_SDK {
      */
     async create_conversion_quote(args: CreateConversionQuoteArgs): Promise<CreateConversionQuoteResult> {
         const mutation = gql`
-            mutation ($user_id: String, $source_currency_id: String!, $target_currency_id: String!, $source_currency_amount: Float!, $target_currency_amount: Float) {
+            mutation ($user_id: String, $source_currency_id: String!, $target_currency_id: String!, $source_currency_amount: Float, $target_currency_amount: Float) {
                 create_conversion_quote(
                     user_id: $user_id
                     source_currency_id: $source_currency_id
@@ -332,6 +336,7 @@ export class Reserve_SDK {
     /**
      * **ASYNC** `create_account_transaction` method allows **ADMINS** to create new transactions
      * * ### Usage
+     *
      * ```ts
      * import {Reserve_SDK} from 'reserve-sdk';
      *
