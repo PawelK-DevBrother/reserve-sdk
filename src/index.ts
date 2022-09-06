@@ -353,7 +353,7 @@ export class Reserve_SDK {
      *
      * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
      * Sdk_Instance.setAuthToken("admin_token")
-     * const user = await Sdk_Instance.get_user_info({user_id:"your_user_id",first_name:"test_first_name"})
+     * const user = await Sdk_Instance.update_user({user_id:"your_user_id",first_name:"test_first_name"})
      * ```
      */
     async update_user(args: UpdateUserArgs): Promise<User> {
