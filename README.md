@@ -60,16 +60,18 @@ const users = await Sdk_Instance.get_users();
 - [trader demo signin](#trader-demo-signin)
 - [admin demo signin](#admin-demo-signin)
 - [get users](#get-users)
+- [get user info](#get-user-info)
+- [update user](#update-user)
 - [get account balances](#get-account-balances)
 - [create conversion quote](#create-conversion-quote)
 - [create conversion order](#create-conversion-order)
 - [create account transaction](#create-account-transaction)
 - [get instruments](#get-instruments)
 - [get instruments price bars](#get-instruments-price-bars)
-- [deposit_address_crypto](#deposit-address-crypto)
-- [create_withdrawal_fiat](#create-withdrawal-fiat)
-- [get_conversions](#get-converions)
-- [get_payments](#get-payments)
+- [generate deposit address crypto](#generate-deposit-address-crypto)
+- [create withdrawal fiat](#create-withdrawal-fiat)
+- [get conversions](#get-converions)
+- [get payments](#get-payments)
 
 
 #### Health check
@@ -229,9 +231,9 @@ const res = await Sdk_Instance.get_instrument_price_bars({
 });
 ```
 
-#### Deposit address crypto
+#### Generate deposit address crypto
 
-##### Allows **AUTHENTICATED** users to create new deposits
+##### Allows **AUTHENTICATED** users to create generate new crypto deposit addresses
 
 **Trader**
 ```ts
@@ -372,3 +374,10 @@ const res = await Sdk_Instance.get_payments({
         time_to: '2022-08-02 18:40:05',
     }
 });
+```
+
+
+#### Get user info
+
+
+#### Update user

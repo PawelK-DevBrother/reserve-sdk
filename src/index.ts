@@ -6,8 +6,8 @@ import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
 import {HealthCheckResult} from './@types/utils.types';
 import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
-import {DepositAddressCrypto, DepositAddressCryptoArgs} from './@types/deposit.address.crypto.types';
-import {User, SortDirection, GetUsersFilterArgs} from './@types/users.types';
+import {DepositAddressCrypto, DepositAddressCryptoArgs, FavoriteAddressCrypto} from './@types/deposit.address.crypto.types';
+import {User, SortDirection, GetUsersFilterArgs, GetOneUserArgs, UpdateUserArgs} from './@types/users.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
 import {RecordTransactionItem, CreateAccountTransactionResult} from './@types/transactions.types';
 import {GetInstrumentsArgs, Instrument, GetInstrumentPriceBarsArgs, InstrumentPriceHistory} from './@types/instrument.types';
@@ -173,12 +173,12 @@ export class Reserve_SDK {
                 users(username: $username, email: $email, pager: $pager, sort: $sort, dateRange: $dateRange) {
                     serial_id
                     user_id
+                    parent_user_id
                     username
                     email
                     language
                     timezone
                     primary_market_currency
-                    exchange
                     is_active
                     first_name
                     last_name
@@ -188,22 +188,288 @@ export class Reserve_SDK {
                     address_line_1
                     address_line_2
                     address_zip
+                    fee_group_id
+                    limit_group_id
+                    kyc_level
+                    kyc_status
+                    kyc_message
                     created_at
+                    mfa_for_withdraw
                     updated_at
                     favorite_instruments
+                    favorite_addresses_crypto {
+                        currency_id
+                        address
+                        address_tag_type
+                        address_tag_value
+                        network
+                        name
+                    }
+                    favorite_fiat_destinations {
+                        name
+                        bank_name
+                        bank_address
+                        bank_bic
+                        routing_number
+                        reference
+                        notes
+                        beneficiary_name
+                        beneficiary_account_number
+                        beneficiary_address_line_1
+                        beneficiary_address_line_2
+                    }
                     profile_pic_url
                     passport_url
                     national_identity_url
                     driver_license_url
                     birth_certificate_url
                     bank_statement_url
+                    mfa_status
                     utility_bill_url
+                    parent_user {
+                        user_id
+                    }
                 }
             }
         `;
 
         const {users} = await this.gql_request(query, {...defaultArgs, ...args});
         return users;
+    }
+
+    /**
+     * **ASYNC** `get_user_info` method allows USERS to get info about themselfs and allows ADMIN to get info about specified user (user_id arg)
+     * * ### Usage
+     *
+     * **Trader**
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const user = await Sdk_Instance.get_user_info()
+     * ```
+     *
+     * **Admin** - user_id **arg** available
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token")
+     * const user = await Sdk_Instance.get_user_info({user_id:"your_user_id"})
+     * ```
+     */
+    async get_user_info(args?: GetOneUserArgs): Promise<User> {
+        const query = gql`
+            query ($user_id: String) {
+                user(user_id: $user_id) {
+                    serial_id
+                    user_id
+                    parent_user_id
+                    username
+                    email
+                    language
+                    timezone
+                    primary_market_currency
+                    is_active
+                    first_name
+                    last_name
+                    address_country
+                    address_state
+                    address_city
+                    address_line_1
+                    address_line_2
+                    address_zip
+                    fee_group_id
+                    limit_group_id
+                    kyc_level
+                    kyc_status
+                    kyc_message
+                    created_at
+                    mfa_for_withdraw
+                    updated_at
+                    favorite_instruments
+                    favorite_addresses_crypto {
+                        currency_id
+                        address
+                        address_tag_type
+                        address_tag_value
+                        network
+                        name
+                    }
+                    favorite_fiat_destinations {
+                        name
+                        bank_name
+                        bank_address
+                        bank_bic
+                        routing_number
+                        reference
+                        notes
+                        beneficiary_name
+                        beneficiary_account_number
+                        beneficiary_address_line_1
+                        beneficiary_address_line_2
+                    }
+                    profile_pic_url
+                    passport_url
+                    national_identity_url
+                    driver_license_url
+                    birth_certificate_url
+                    bank_statement_url
+                    mfa_status
+                    utility_bill_url
+                    parent_user {
+                        user_id
+                    }
+                }
+            }
+        `;
+
+        const {user} = await this.gql_request(query, args);
+        return user;
+    }
+
+    async get_user_favorite_addresses(args?: GetOneUserArgs): Promise<FavoriteAddressCrypto[]> {
+        const user = await this.get_user_info(args);
+        return user.favorite_addresses_crypto;
+    }
+
+    /**
+     * **ASYNC** `update_user` method allows USERS to update their details and allows ADMIN to update specified user (user_id arg)
+     * * ### Usage
+     *
+     * **Trader**
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("trader_token");
+     * const user = await Sdk_Instance.update_user({first_name:"test_first_name"})
+     * ```
+     *
+     * **Admin** - user_id **arg** available
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * Sdk_Instance.setAuthToken("admin_token")
+     * const user = await Sdk_Instance.get_user_info({user_id:"your_user_id",first_name:"test_first_name"})
+     * ```
+     */
+    async update_user(args: UpdateUserArgs): Promise<User> {
+        const mutation = gql`
+            mutation (
+                $user_id: String
+                $parent_user_id: String
+                $username: String
+                $email: String
+                $language: String
+                $timezone: String
+                $primary_market_currency: String
+                $first_name: String
+                $last_name: String
+                $address_country: String
+                $address_state: String
+                $address_city: String
+                $address_line_1: String
+                $address_line_2: String
+                $address_zip: String
+                $updated_at: String
+                $favorite_instruments: [String!]
+                $mfa_token: String
+                $is_active: ToggleSwitch
+                $mfa_for_withdraw: ToggleSwitch
+                $favorite_addresses_crypto: [FavoriteAddressCryptoItem!]
+                $favorite_fiat_destinations: [FavoriteFiatDestinationItem!]
+            ) {
+                update_user(
+                    user_id: $user_id
+                    parent_user_id: $parent_user_id
+                    username: $username
+                    email: $email
+                    language: $language
+                    timezone: $timezone
+                    primary_market_currency: $primary_market_currency
+                    first_name: $first_name
+                    last_name: $last_name
+                    address_country: $address_country
+                    address_state: $address_state
+                    address_city: $address_city
+                    address_line_1: $address_line_1
+                    address_line_2: $address_line_2
+                    address_zip: $address_zip
+                    updated_at: $updated_at
+                    favorite_instruments: $favorite_instruments
+                    mfa_token: $mfa_token
+                    is_active: $is_active
+                    mfa_for_withdraw: $mfa_for_withdraw
+                    favorite_addresses_crypto: $favorite_addresses_crypto
+                    favorite_fiat_destinations: $favorite_fiat_destinations
+                ) {
+                    serial_id
+                    user_id
+                    parent_user_id
+                    username
+                    email
+                    language
+                    timezone
+                    primary_market_currency
+                    is_active
+                    first_name
+                    last_name
+                    address_country
+                    address_state
+                    address_city
+                    address_line_1
+                    address_line_2
+                    address_zip
+                    fee_group_id
+                    limit_group_id
+                    kyc_level
+                    kyc_status
+                    kyc_message
+                    created_at
+                    mfa_for_withdraw
+                    updated_at
+                    favorite_instruments
+                    favorite_addresses_crypto {
+                        currency_id
+                        address
+                        address_tag_type
+                        address_tag_value
+                        network
+                        name
+                    }
+                    favorite_fiat_destinations {
+                        name
+                        bank_name
+                        bank_address
+                        bank_bic
+                        routing_number
+                        reference
+                        notes
+                        beneficiary_name
+                        beneficiary_account_number
+                        beneficiary_address_line_1
+                        beneficiary_address_line_2
+                    }
+                    profile_pic_url
+                    passport_url
+                    national_identity_url
+                    driver_license_url
+                    birth_certificate_url
+                    bank_statement_url
+                    mfa_status
+                    utility_bill_url
+                    parent_user {
+                        user_id
+                    }
+                }
+            }
+        `;
+
+        const {user} = await this.gql_request(mutation, args);
+        return user;
     }
 
     /**

@@ -23,3 +23,49 @@ export interface DepositAddressCryptoArgs {
     currency_id: string;
     user_id?: string;
 }
+
+export interface FavoriteAddressCrypto {
+    currency_id: string;
+    address?: string;
+    address_tag_type?: CryptoAddressTagType;
+    address_tag_value?: string;
+    network?: string;
+    name?: string;
+}
+
+export interface FavoriteAddressCryptoItem {
+    currency_id: string;
+    address?: string;
+    address_tag_type?: CryptoAddressTagType;
+    address_tag_value?: string;
+    network?: string;
+    name?: string;
+}
+
+export interface FavoriteFiatDestination {
+    name: string;
+    bank_name?: string;
+    bank_address?: string;
+    bank_bic?: string;
+    routing_number?: string;
+    reference?: string;
+    notes?: string;
+    beneficiary_name?: string;
+    beneficiary_account_number?: string;
+    beneficiary_address_line_1?: string;
+    beneficiary_address_line_2?: string;
+}
+
+export interface FavoriteFiatDestinationItem {
+    name: string;
+    bank_name?: string;
+    bank_address?: string;
+    bank_bic?: string;
+    routing_number?: string;
+    reference?: string;
+    notes?: string;
+    beneficiary_name?: string;
+    beneficiary_account_number?: string;
+    beneficiary_address_line_1?: string;
+    beneficiary_address_line_2?: string;
+}
