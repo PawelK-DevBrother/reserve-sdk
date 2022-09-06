@@ -1,11 +1,11 @@
-import {GetPaymentsHistoryArgs} from './@types/payments.types';
+import {GetPaymentsHistoryArgs, GetPaymentsRoutesArgs, PaymentRoute} from './@types/payments.types';
 import {CreateFiatWithdrawalArgs, Payment} from './@types/create.fiat.withdrawal.types';
 // Tools
 import {GraphQlCustomError} from './utils';
 import {gql, GraphQLClient, Variables} from 'graphql-request';
 // Types
 import {HealthCheckResult} from './@types/utils.types';
-import {DemoSigninArgs, SignInResult} from './@types/demo.signin.types';
+import {DemoSigninArgs, SignInResult, ServiceSigninArgs} from './@types/demo.signin.types';
 import {DepositAddressCrypto, DepositAddressCryptoArgs, FavoriteAddressCrypto} from './@types/deposit.address.crypto.types';
 import {User, SortDirection, GetUsersFilterArgs, GetOneUserArgs, UpdateUserArgs} from './@types/users.types';
 import {AccountBalance, GetAccountBalanceArgs} from './@types/accounts.types';
@@ -143,6 +143,31 @@ export class Reserve_SDK {
 
         const {admin_demo_signin} = await this.gql_request(mutation, args);
         return admin_demo_signin;
+    }
+
+    /**
+     * **ASYNC** `admin_demo_signin` method allows to obtain demo **ADMIN** authentication token for specified username
+     * * ### Usage
+     *
+     * ```ts
+     * import {Reserve_SDK} from 'reserve-sdk';
+     *
+     * const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+     * const res = await Sdk_Instance.service_signin({service_api_key:"example_1_2_3",service_api_secret:"example_4_5_6"});
+     * ```
+     */
+    async service_signin(args: ServiceSigninArgs): Promise<SignInResult> {
+        const mutation = gql`
+            mutation ($service_api_key: String!, $service_api_secret: String!) {
+                service_signin(service_api_key: $service_api_key, service_api_secret: $service_api_secret) {
+                    jwt
+                    expires_at
+                }
+            }
+        `;
+
+        const {service_signin} = await this.gql_request(mutation, args);
+        return service_signin;
     }
 
     /**
@@ -1083,8 +1108,18 @@ export class Reserve_SDK {
      */
     async get_payments(args?: GetPaymentsHistoryArgs): Promise<Payment[]> {
         const query = gql`
-            query ($payment_id: String, $currency_id: String, $type: PaymentType, $user_id: String, $search: String, $status: [PaymentStatus!]) {
-                payments(payment_id: $payment_id, currency_id: $currency_id, type: $type, user_id: $user_id, search: $search, status: $status) {
+            query (
+                $payment_id: String
+                $currency_id: String
+                $type: PaymentType
+                $user_id: String
+                $search: String
+                $status: [PaymentStatus!]
+                $pager: PagerInput
+                $sort: SortInput
+                $dateRange: DateRangeInput
+            ) {
+                payments(payment_id: $payment_id, currency_id: $currency_id, type: $type, user_id: $user_id, search: $search, status: $status, pager: $pager, sort: $sort, dateRange: $dateRange) {
                     payment_id
                     user_id
                     currency_id
@@ -1123,6 +1158,24 @@ export class Reserve_SDK {
 
         const {payments} = await this.gql_request(query, args);
         return payments;
+    }
+
+    async get_payments_routes(args?: GetPaymentsRoutesArgs): Promise<PaymentRoute[]> {
+        const query = gql`
+            query ($pager: PagerInput, $sort: SortInput) {
+                payments_routes(pager: $pager, sort: $sort) {
+                    payment_route_id
+                    currency_id
+                    psp_service_id
+                    crypto_network
+                    crypto_address_tag_type
+                    is_active
+                }
+            }
+        `;
+
+        const {payments_routes} = await this.gql_request(query, args);
+        return payments_routes;
     }
 }
 

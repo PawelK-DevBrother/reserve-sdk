@@ -59,6 +59,7 @@ const users = await Sdk_Instance.get_users();
 - [check-in](#check-in)
 - [trader demo signin](#trader-demo-signin)
 - [admin demo signin](#admin-demo-signin)
+- [service demo signin](#service-demo-signin)
 - [get users](#get-users)
 - [get user info](#get-user-info)
 - [update user](#update-user)
@@ -72,6 +73,7 @@ const users = await Sdk_Instance.get_users();
 - [create withdrawal fiat](#create-withdrawal-fiat)
 - [get conversions](#get-converions)
 - [get payments](#get-payments)
+- [get payments routes](#get-payments-routes)
 
 
 #### Health check
@@ -114,6 +116,16 @@ const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
 const res = await Sdk_Instance.admin_demo_signin({username:"example_1_2_3"});
 ```
 
+#### Service demo signin 
+
+##### Allows to obtain demo **SERVICE** authentication token for specified username
+```ts
+import {Reserve_SDK} from 'reserve-sdk';
+     
+const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
+const res = await Sdk_Instance.service_signin({service_api_key:"example_1_2_3",service_api_secret:"example_4_5_6"});
+```
+
 #### Get users 
 
 ##### Allows ADMINS to get users that can be filtered by multiple parameters
@@ -125,6 +137,10 @@ const Sdk_Instance = new Reserve_SDK("your_graphQL_endpoint");
 Sdk_Instance.setAuthToken("admin_token");
 const users = await Sdk_Instance.get_users({username: 'y', pager: {limit: 3}});
 ```
+
+#### Get user info
+
+#### Update user
 
 #### Get account balances 
 
@@ -377,7 +393,6 @@ const res = await Sdk_Instance.get_payments({
 ```
 
 
-#### Get user info
 
+#### Get payments routes
 
-#### Update user

@@ -57,10 +57,12 @@ interface PagerInput {
 interface SortInput {
     direction: SortDirection;
 }
-
-export interface PagerSortDateRange {
+export interface PagerSort {
     pager?: PagerInput;
     sort?: SortInput;
+}
+
+export interface PagerSortDateRange extends PagerSort {
     dateRange?: DateRangeInput;
 }
 
