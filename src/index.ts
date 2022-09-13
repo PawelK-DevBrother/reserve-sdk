@@ -1,3 +1,4 @@
+import {EstimateNetworkFeeArgs, EstimateNetworkFeeResult} from './@types/fees.types';
 import {GetPaymentsHistoryArgs, GetPaymentsRoutesArgs, PaymentRoute} from './@types/payments.types';
 import {CreateFiatWithdrawalArgs, Payment} from './@types/create.fiat.withdrawal.types';
 // Tools
@@ -1177,6 +1178,39 @@ export class Reserve_SDK {
         const {payments_routes} = await this.gql_request(query, args);
         return payments_routes;
     }
+
+    async get_network_fees(args: EstimateNetworkFeeArgs): Promise<EstimateNetworkFeeResult> {
+        const query = gql`
+            mutation ($currency_id: String!, $network: String, $psp_service_id: String) {
+                estimate_network_fee(currency_id: $currency_id, network: $network, psp_service_id: $psp_service_id) {
+                    low {
+                        fee_per_byte
+                        gas_price
+                        network_fee
+                        base_fee
+                        priority_fee
+                    }
+                    medium {
+                        fee_per_byte
+                        gas_price
+                        network_fee
+                        base_fee
+                        priority_fee
+                    }
+                    high {
+                        fee_per_byte
+                        gas_price
+                        network_fee
+                        base_fee
+                        priority_fee
+                    }
+                }
+            }
+        `;
+
+        const {estimate_network_fee} = await this.gql_request(query, args);
+        return estimate_network_fee;
+    }
 }
 
 export * from './utils';
@@ -1190,3 +1224,4 @@ export * from './@types/transactions.types';
 export * from './@types/deposit.address.crypto.types';
 export * from './@types/create.fiat.withdrawal.types';
 export * from './@types/payments.types';
+export * from './@types/fees.types';
