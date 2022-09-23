@@ -1,4 +1,4 @@
-## Reserve SDK
+## Reserve SDK 
 
 ---
 
@@ -14,12 +14,14 @@ npm i reserve-sdk
 ### Custom headers
 
 ```ts
+// auth headers
 Sdk_Instance.setAuthToken('auth_token')
 
 Sdk_Instance.setXReserveAuth('x_reserve_auth_value');
 
 console.log(Sdk_Instance.getHeaders());
 
+// custom headers
 Sdk_Instance.setCustomHeader('x-reserve-auth', 'value');
 
 Sdk_Instance.setCustomHeader('custom_header', 'custom_value');
@@ -391,7 +393,6 @@ const res = await Sdk_Instance.get_payments({
     }
 });
 ```
-
 
 
 #### Get payments routes
