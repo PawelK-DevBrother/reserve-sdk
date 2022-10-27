@@ -67,4 +67,6 @@ export interface Conversion {
     updated_at: string;
     created_at_iso: string;
     updated_at_iso: string;
+    instrument_strategy_id: string;
+    version: number;
 }

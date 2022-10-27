@@ -553,7 +553,13 @@ export class Reserve_SDK {
      */
     async create_conversion_quote(args: CreateConversionQuoteArgs): Promise<CreateConversionQuoteResult> {
         const mutation = gql`
-            mutation ($user_id: String, $source_currency_id: String!, $target_currency_id: String!, $source_currency_amount: Float, $target_currency_amount: Float) {
+            mutation (
+                $user_id: String
+                $source_currency_id: String!
+                $target_currency_id: String!
+                $source_currency_amount: Float
+                $target_currency_amount: Float
+            ) {
                 create_conversion_quote(
                     user_id: $user_id
                     source_currency_id: $source_currency_id
@@ -597,7 +603,12 @@ export class Reserve_SDK {
 
         const mutation = gql`
             mutation ($user_id: String, $reference: String, $return_on_complete: Boolean!, $conversion_quote_id: String!) {
-                create_conversion_order(user_id: $user_id, reference: $reference, return_on_complete: $return_on_complete, conversion_quote_id: $conversion_quote_id) {
+                create_conversion_order(
+                    user_id: $user_id
+                    reference: $reference
+                    return_on_complete: $return_on_complete
+                    conversion_quote_id: $conversion_quote_id
+                ) {
                     conversion_id
                     conversion_quote_id
                     reference
@@ -1058,6 +1069,8 @@ export class Reserve_SDK {
                     updated_at
                     created_at_iso
                     updated_at_iso
+                    instrument_strategy_id
+                    version
                 }
             }
         `;
@@ -1120,17 +1133,32 @@ export class Reserve_SDK {
                 $sort: SortInput
                 $dateRange: DateRangeInput
             ) {
-                payments(payment_id: $payment_id, currency_id: $currency_id, type: $type, user_id: $user_id, search: $search, status: $status, pager: $pager, sort: $sort, dateRange: $dateRange) {
+                payments(
+                    payment_id: $payment_id
+                    currency_id: $currency_id
+                    type: $type
+                    user_id: $user_id
+                    search: $search
+                    status: $status
+                    pager: $pager
+                    sort: $sort
+                    dateRange: $dateRange
+                ) {
                     payment_id
+                    remote_txid
                     user_id
                     currency_id
                     amount
                     type
+                    psp_service_id
+                    psp_event_bridge_event_id
                     crypto_transaction_id
                     crypto_address
                     crypto_address_tag_type
                     crypto_address_tag_value
                     crypto_network
+                    crypto_network_fee_preference
+                    crypto_confirmations_received
                     fiat_bank_name
                     fiat_bank_address
                     fiat_bank_bic
@@ -1143,16 +1171,23 @@ export class Reserve_SDK {
                     fiat_beneficiary_address_line_2
                     status
                     approval_status
+                    approval_reason
+                    approved_by
+                    approved_at
+                    body_amount
+                    fee_amount
                     record_account_transaction_id
                     revert_account_transaction_id
                     ip_address
                     message
                     error_message
+                    reference
                     created_at
+                    fees_included
                     updated_at
-                    psp_service_id
-                    body_amount
-                    fee_amount
+                    version
+                    created_at_iso
+                    updated_at_iso
                 }
             }
         `;
