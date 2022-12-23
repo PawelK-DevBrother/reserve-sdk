@@ -8,6 +8,8 @@ export interface GetPaymentsHistoryArgs extends PagerSortDateRange {
     user_id?: string;
     search?: string;
     status?: PaymentStatus[];
+    payment_id_in?: string[];
+    payment_id_not_in?: string[];
 }
 
 export interface PaymentRoute {

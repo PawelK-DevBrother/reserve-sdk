@@ -1132,6 +1132,8 @@ export class Reserve_SDK {
                 $pager: PagerInput
                 $sort: SortInput
                 $dateRange: DateRangeInput
+                $payment_id_in: [String!]
+                $payment_id_not_in: [String!]
             ) {
                 payments(
                     payment_id: $payment_id
@@ -1143,6 +1145,8 @@ export class Reserve_SDK {
                     pager: $pager
                     sort: $sort
                     dateRange: $dateRange
+                    payment_id_in: $payment_id_in
+                    payment_id_not_in: $payment_id_not_in
                 ) {
                     payment_id
                     remote_txid
